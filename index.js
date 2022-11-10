@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
@@ -17,6 +18,13 @@ async function run() {
     try {
         const serviceCollection = client.db('mykitchen').collection('services');
         const reviewCollection = client.db('mykitchen').collection('reviews');
+
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10h' });
+            res.send({ token })
+        })
+
         // to get data from DataBase and create API to call from client side.
         app.get('/services', async (req, res) => {
             const query = {};
@@ -49,7 +57,7 @@ async function run() {
             res.send(result);
         });
         // reviews api to get data from database.
-        app.get('/revies', async (req, res) => {
+        app.get('/reviews', async (req, res) => {
             const query = {};
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
