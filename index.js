@@ -58,10 +58,24 @@ async function run() {
         });
         // reviews api to get data from database.
         app.get('/reviews', async (req, res) => {
-            const query = {};
+            const id = req.query.id
+            const query = { service: id };
             const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
             res.send(reviews);
+        });
+        app.get('/reviews/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+        app.delete('/reviews/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const review = await reviewCollection.deleteOne(query);
+            res.send(review);
         })
     }
     finally {
