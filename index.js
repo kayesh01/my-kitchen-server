@@ -54,7 +54,8 @@ async function run() {
         app.post('/reviews', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
-            res.send(result);
+            const final = await reviewCollection.findOne(result.insertedId);
+            res.send({ final, result });
         });
         // reviews api to get data from database.
         app.get('/reviews', async (req, res) => {
@@ -76,7 +77,17 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const review = await reviewCollection.deleteOne(query);
             res.send(review);
-        })
+        });
+        // update api
+        app.post('/services/:id/update', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const service = await serviceCollection.updateOne(query, {
+                $set: { reviews: req.body.reviews }
+            });
+            res.send(service);
+        });
+
     }
     finally {
 
